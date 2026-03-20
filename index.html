@@ -269,10 +269,11 @@
       <h1>WC幣兌楓幣計算工具</h1>
       <p class="sub">
         固定每個物品的 WC 幣，使用者輸入楓幣後，自動計算比例：<b>楓幣 / WC幣</b>。<br>
+        輸入完成點選排序<br>
       </p>
 
       <div class="toolbar">
-        <button id="sortBtn" class="btn-primary">目前排序：高 → 低（點我切換並排序）</button>
+        <button id="sortBtn" class="btn-primary">（點我並排序）</button>
         <button id="clearBtn" class="btn-secondary">清空全部輸入</button>
       </div>
 
@@ -575,8 +576,8 @@
     function updateSortButton() {
       document.getElementById("sortBtn").textContent =
         sortMode === "desc"
-          ? "目前排序：高 → 低（點我切換並排序）"
-          : "目前排序：低 → 高（點我切換並排序）";
+          ? "（點我並排序）"
+          : "（點我並排序）";
     }
 
     document.getElementById("sortBtn").addEventListener("click", () => {
