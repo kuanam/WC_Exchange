@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WC幣兌楓幣計算工具</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, "Microsoft JhengHei", sans-serif;
+      background: linear-gradient(180deg, #f3f6fb 0%, #eef4ff 100%);
+      color: #1f2937;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 36px auto;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 22px;
+      box-shadow: 0 14px 40px rgba(37, 99, 235, 0.08);
+      padding: 24px;
+      border: 1px solid #e5e7eb;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      line-height: 1.2;
+    }
+
+    .sub {
+      margin: 0 0 22px;
+      color: #6b7280;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 18px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+
+    .panel-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .panel {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .panel-title {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .panel-value {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .panel-sub {
+      margin-top: 6px;
+      color: #6b7280;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .best-box {
+      background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+      border-color: #bbf7d0;
+    }
+
+    .best-box .panel-value {
+      color: #047857;
+    }
+
+    .best-box .panel-sub {
+      color: #065f46;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      background: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      background: white;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      text-align: center;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #f9fafb;
+      font-size: 14px;
+      color: #374151;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr.best-row {
+      background: #f0fdf4;
+    }
+
+    td.name {
+      font-weight: 700;
+    }
+
+    .name-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #3730a3;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .wc-text {
+      font-weight: 700;
+      color: #374151;
+    }
+
+    .input-shell {
+      display: flex;
+      justify-content: center;
+    }
+
+    input[type="text"] {
+      width: 150px;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      font-size: 15px;
+      text-align: right;
+      outline: none;
+      background: #fff;
+    }
+
+    input[type="text"]:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    .ratio {
+      font-weight: 800;
+      color: #1d4ed8;
+      letter-spacing: 0.3px;
+    }
+
+    .rank-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #1d4ed8;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .rank-empty {
+      background: #f3f4f6;
+      color: #9ca3af;
+    }
+
+    .hint {
+      margin-top: 16px;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+
+    @media (max-width: 860px) {
+      .panel-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      input[type="text"] {
+        width: 120px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>WC幣兌楓幣計算工具</h1>
+      <p class="sub">
+        固定每個物品的 WC 幣，使用者輸入楓幣後，自動計算比例：<b>楓幣 / WC幣</b>。<br>
+      </p>
+
+      <div class="toolbar">
+        <button id="sortBtn" class="btn-primary">目前排序：高 → 低（點我切換並排序）</button>
+        <button id="clearBtn" class="btn-secondary">清空全部輸入</button>
+      </div>
+
+      <div class="panel-grid">
+        <div class="panel">
+          <div class="panel-title">目前排序模式</div>
+          <div class="panel-value" id="sortModeText">高 → 低</div>
+        </div>
+
+
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>排名</th>
+              <th>物品</th>
+              <th>WC幣</th>
+              <th>楓幣（萬）</th>
+              <th>比例（楓幣:WC）</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const items = [
+      { name: "順移石", wc: 36.36 },
+      { name: "SP卷", wc: 350 },
+      { name: "AP卷", wc: 450 },
+      { name: "背包", wc: 250 },
+      { name: "高效能喇叭", wc: 109.9 },
+      { name: "突襲券", wc: 171.4 },
+      { name: "護身符", wc: 40.9 }
+    ];
+
+    let sortMode = localStorage.getItem("wc_sort_mode") || "desc";
+    let currentOrder = JSON.parse(localStorage.getItem("wc_row_order") || "null");
+
+    function getSavedInputs() {
+      try {
+        return JSON.parse(localStorage.getItem("wc_inputs")) || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveInputs(data) {
+      localStorage.setItem("wc_inputs", JSON.stringify(data));
+    }
+
+    function saveSortMode() {
+      localStorage.setItem("wc_sort_mode", sortMode);
+    }
+
+    function saveRowOrder(order) {
+      localStorage.setItem("wc_row_order", JSON.stringify(order));
+    }
+
+    function sanitizeDecimal(value) {
+      value = value.replace(/[^0-9.]/g, "");
+      const parts = value.split(".");
+
+      if (parts.length > 2) {
+        value = parts[0] + "." + parts.slice(1).join("");
+      }
+
+      if (value.startsWith(".")) {
+        value = "0" + value;
+      }
+
+      return value;
+    }
+
+    function addThousands(rawValue) {
+      if (rawValue === "" || rawValue === ".") return rawValue;
+
+      const [intPart, decPart] = rawValue.split(".");
+      const safeInt = intPart === "" ? "0" : intPart;
+      const formattedInt = safeInt.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+      if (rawValue.includes(".")) {
+        return formattedInt + "." + (decPart ?? "");
+      }
+
+      return formattedInt;
+    }
+
+    function removeThousands(value) {
+      return value.replace(/,/g, "");
+    }
+
+    function formatDisplayValue(rawValue) {
+      const clean = sanitizeDecimal(removeThousands(rawValue));
+      return addThousands(clean);
+    }
+
+    function getRawInputValue(index) {
+      const input = document.getElementById(`input-${index}`);
+      if (!input) return "";
+      return sanitizeDecimal(removeThousands(input.value.trim()));
+    }
+
+    function setInputDisplayValue(index, rawValue) {
+      const input = document.getElementById(`input-${index}`);
+      if (!input) return;
+      input.value = addThousands(rawValue);
+    }
+
+    function buildTable() {
+      const tableBody = document.getElementById("tableBody");
+      const savedInputs = getSavedInputs();
+      tableBody.innerHTML = "";
+
+      let renderOrder = items.map((_, index) => index);
+
+      if (
+        Array.isArray(currentOrder) &&
+        currentOrder.length === items.length &&
+        currentOrder.every(index => Number.isInteger(index) && index >= 0 && index < items.length)
+      ) {
+        renderOrder = currentOrder;
+      }
+
+      renderOrder.forEach((index) => {
+        const item = items[index];
+        const rawSaved = sanitizeDecimal(String(savedInputs[index] ?? ""));
+
+        const tr = document.createElement("tr");
+        tr.dataset.index = index;
+
+        tr.innerHTML = `
+          <td><span class="rank-pill rank-empty" id="rank-${index}">-</span></td>
+          <td class="name"><span class="name-badge">${item.name}</span></td>
+          <td class="wc-text">${item.wc}</td>
+          <td>
+            <div class="input-shell">
+              <input
+                type="text"
+                id="input-${index}"
+                inputmode="decimal"
+                placeholder="請輸入"
+                value="${addThousands(rawSaved)}"
+              />
+            </div>
+          </td>
+          <td class="ratio" id="ratio-${index}">--</td>
+        `;
+
+        tableBody.appendChild(tr);
+      });
+
+      items.forEach((_, index) => {
+        const input = document.getElementById(`input-${index}`);
+
+        input.addEventListener("focus", () => {
+          const raw = getRawInputValue(index);
+          input.value = raw;
+        });
+
+        input.addEventListener("blur", () => {
+          const raw = getRawInputValue(index);
+          input.value = addThousands(raw);
+          persistInputs();
+          updateValuesOnly();
+        });
+
+        input.addEventListener("input", () => {
+          const cursorPos = input.selectionStart || 0;
+          const before = input.value;
+
+          const raw = sanitizeDecimal(removeThousands(before));
+          input.value = raw;
+
+          const newPos = Math.min(cursorPos, input.value.length);
+          input.setSelectionRange(newPos, newPos);
+
+          persistInputs();
+          updateValuesOnly();
+        });
+      });
+    }
+
+    function persistInputs() {
+      const data = {};
+      items.forEach((_, index) => {
+        data[index] = getRawInputValue(index);
+      });
+      saveInputs(data);
+    }
+
+    function getComputedData() {
+      const data = [];
+
+      items.forEach((item, index) => {
+        const raw = getRawInputValue(index);
+        if (raw === "" || raw === ".") return;
+
+        const maple = parseFloat(raw);
+        if (isNaN(maple)) return;
+
+        data.push({
+          index,
+          maple,
+          wc: item.wc,
+          ratio: maple / item.wc
+        });
+      });
+
+      return data;
+    }
+
+    function updateValuesOnly() {
+      const data = getComputedData();
+      const map = new Map(data.map(item => [item.index, item]));
+
+      items.forEach((_, index) => {
+        const info = map.get(index);
+        const ratioEl = document.getElementById(`ratio-${index}`);
+        const rankEl = document.getElementById(`rank-${index}`);
+        const rowEl = document.querySelector(`tr[data-index="${index}"]`);
+
+        rowEl.classList.remove("best-row");
+        rankEl.textContent = "-";
+        rankEl.className = "rank-pill rank-empty";
+
+        if (!info) {
+          ratioEl.textContent = "--";
+        } else {
+          ratioEl.textContent = info.ratio.toFixed(6);
+        }
+      });
+
+
+      updateStats();
+      updateSortButton();
+    }
+
+    function applySort() {
+      const tableBody = document.getElementById("tableBody");
+      const data = getComputedData();
+
+      data.sort((a, b) => {
+        return sortMode === "desc"
+          ? b.ratio - a.ratio
+          : a.ratio - b.ratio;
+      });
+
+      const sortedIndexes = data.map(item => item.index);
+      const unsortedIndexes = items
+        .map((_, index) => index)
+        .filter(index => !sortedIndexes.includes(index));
+
+      const finalOrder = [...sortedIndexes, ...unsortedIndexes];
+      currentOrder = finalOrder;
+      saveRowOrder(finalOrder);
+
+      items.forEach((_, index) => {
+        const rankEl = document.getElementById(`rank-${index}`);
+        const rowEl = document.querySelector(`tr[data-index="${index}"]`);
+        rankEl.textContent = "-";
+        rankEl.className = "rank-pill rank-empty";
+        rowEl.classList.remove("best-row");
+      });
+
+      data.forEach((item, i) => {
+        const rankEl = document.getElementById(`rank-${item.index}`);
+        rankEl.textContent = i + 1;
+        rankEl.className = "rank-pill";
+
+        if (i === 0) {
+          document.querySelector(`tr[data-index="${item.index}"]`).classList.add("best-row");
+        }
+      });
+
+      finalOrder.forEach(index => {
+        const row = tableBody.querySelector(`tr[data-index="${index}"]`);
+        if (row) tableBody.appendChild(row);
+      });
+
+
+      updateStats();
+      updateSortButton();
+    }
+
+
+
+    function updateStats() {
+      document.getElementById("sortModeText").textContent =
+        sortMode === "desc" ? "高 → 低" : "低 → 高";
+    }
+
+    function updateSortButton() {
+      document.getElementById("sortBtn").textContent =
+        sortMode === "desc"
+          ? "目前排序：高 → 低（點我切換並排序）"
+          : "目前排序：低 → 高（點我切換並排序）";
+    }
+
+    document.getElementById("sortBtn").addEventListener("click", () => {
+      sortMode = sortMode === "desc" ? "asc" : "desc";
+      saveSortMode();
+      applySort();
+    });
+
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      localStorage.removeItem("wc_inputs");
+      localStorage.removeItem("wc_row_order");
+      currentOrder = items.map((_, index) => index);
+
+      items.forEach((_, index) => {
+        setInputDisplayValue(index, "");
+        const rankEl = document.getElementById(`rank-${index}`);
+        const ratioEl = document.getElementById(`ratio-${index}`);
+        const rowEl = document.querySelector(`tr[data-index="${index}"]`);
+
+        rankEl.textContent = "-";
+        rankEl.className = "rank-pill rank-empty";
+        ratioEl.textContent = "--";
+        rowEl.classList.remove("best-row");
+      });
+
+      buildTable();
+      updateValuesOnly();
+    });
+
+    buildTable();
+    updateValuesOnly();
+  </script>
+</body>
+</html>
